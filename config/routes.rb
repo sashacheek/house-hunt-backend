@@ -14,6 +14,7 @@ Rails.application.routes.draw do
     post   'login',  to: 'sessions#create'
     delete 'logout', to: 'sessions#destroy'
     resources :listings, only: [:index]
+    resources :listings, only: [:create]
     resources :addresses, only: [:index]
   end
 end

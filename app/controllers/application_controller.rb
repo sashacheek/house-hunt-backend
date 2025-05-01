@@ -1,15 +1,16 @@
 class ApplicationController < ActionController::API
-  # include Authentication
   include ActionController::Cookies
   before_action :authorize_request
 
-  # This method checks if a current user is authorized
+  attr_reader :current_user
+
   def authorize_request
-    render json: { error: 'Not authorized' }, status: :unauthorized unless current_user
+    token = request.headers['Authorization']&.split(' ')&.last
+    @current_user = Lister.find_by(auth_token: token)
+    render json: { error: "Unauthorized" }, status: :unauthorized unless @current_user
   end
 
   def current_user
-    # Assuming you have a header 'Authorization' that contains the token
     @current_user ||= Lister.find_by(auth_token: request.headers['Authorization'])
   end
 end
