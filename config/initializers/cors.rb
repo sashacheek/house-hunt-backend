@@ -17,7 +17,7 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins '*'
+    origins 'https://house-hunt-frontend-1wr5l6rvm-sashacheeks-projects.vercel.app'
     resource '*', headers: :any,
     credentials: true,
     methods: [:get, :post, :put, :patch, :delete, :options, :head]
