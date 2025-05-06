@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::API
   include Authentication
   include ActionController::Cookies
+  include ActionController::Helpers
   before_action :authorize_request
 
   attr_reader :current_user
