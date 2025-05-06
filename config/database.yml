@@ -17,7 +17,8 @@ test:
   database: housing_api_test
 
 production:
-  <<: *default
-  database: <%= ENV.fetch("DATABASE_URL") %>
-  username: <%= ENV.fetch("DB_USERNAME") %>
-  password: <%= ENV.fetch("DB_PASSWORD") %>
+  cable:
+    <<: *default
+    database: <%= ENV.fetch("DATABASE_URL") %>
+    username: <%= ENV.fetch("DB_USERNAME") %>
+    password: <%= ENV.fetch("DB_PASSWORD") %>
