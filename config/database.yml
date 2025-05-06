@@ -17,8 +17,7 @@ test:
   database: housing_api_test
 
 production:
-  primary: &primary_production
-    <<: *default
+  <<: *default
     database: <%= ENV.fetch("DATABASE_URL") %>
     username: <%= ENV.fetch("DB_USERNAME") %>
     password: <%= ENV.fetch("DB_PASSWORD") %>
