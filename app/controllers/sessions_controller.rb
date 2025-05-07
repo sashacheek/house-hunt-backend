@@ -1,21 +1,21 @@
-class SessionsController < ApplicationController
-  allow_unauthenticated_access only: %i[ new create ]
-  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_session_url, alert: "Try again later." }
-
-  def new
-  end
-
-  def create
-    if user = User.authenticate_by(params.permit(:email_address, :password))
-      start_new_session_for user
-      redirect_to after_authentication_url
-    else
-      redirect_to new_session_path, alert: "Try another email address or password."
+module Api
+  class Api::SessionsController < ApplicationController
+    skip_before_action :authorize_request, only: [:create]
+  
+    def create
+      user = Lister.find_by(email: params[:session][:email])
+  
+      if user&.authenticate(params[:session][:password])
+        user.regenerate_auth_token
+        render json: { auth_token: user.auth_token, email: user.email }, status: :ok
+      else
+        render json: { error: "Invalid email or password" }, status: :unauthorized
+      end
     end
-  end
-
-  def destroy
-    terminate_session
-    redirect_to new_session_path
-  end
+  
+    def destroy
+      current_user&.regenerate_auth_token
+      render json: { message: "Logged out successfully." }
+    end
+  end  
 end

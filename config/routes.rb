@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   namespace :api do
     post   'login',  to: 'sessions#create'
     delete 'logout', to: 'sessions#destroy'
+    post 'signup', to: 'listers#create'
     resources :listings, only: [:index]
     resources :listings, only: [:create]
     resources :addresses, only: [:index]

@@ -19,7 +19,7 @@ class Api::ListingsController < ApplicationController
   
     if address.save
       listing = @current_user.listings.build(listing_params.merge(address_id: address.id))
-  
+
       if listing.save
         render json: { listing: listing, address: address }, status: :created
       else
