@@ -1,28 +1,17 @@
-module Authentication
-  extend ActiveSupport::Concern
+class ApplicationController < ActionController::API
+  include Authentication
+  include ActionController::Cookies
+  before_action :authorize_request
 
-  included do
-    before_action :require_authentication
+  attr_reader :current_user
+
+  def authorize_request
+    token = request.headers['Authorization']&.split(' ')&.last
+    @current_user = Lister.find_by(auth_token: token)
+    render json: { error: "Unauthorized" }, status: :unauthorized unless @current_user
   end
 
-  class_methods do
-    def allow_unauthenticated_access(**options)
-      skip_before_action :require_authentication, **options
-    end
+  def current_user
+    @current_user ||= Lister.find_by(auth_token: request.headers['Authorization'])
   end
-
-  private
-
-    def require_authentication
-      token = request.headers['Authorization']&.split(' ')&.last
-      if token.present?
-        Current.user = Lister.find_by(auth_token: token)
-      end
-
-      render json: { error: 'Unauthorized' }, status: :unauthorized unless Current.user
-    end
-
-    def authenticated?
-      Current.user.present?
-    end
 end
