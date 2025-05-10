@@ -3,7 +3,6 @@ class ApplicationController < ActionController::API
   before_action :authorize_request
 
   def authorize_request
-    Rails.logger.debug "Authorization header: #{request.headers['Authorization']}"
     render json: { error: 'Not authorized' }, status: :unauthorized unless current_user
   end
 

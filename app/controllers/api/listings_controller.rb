@@ -1,9 +1,11 @@
 class Api::ListingsController < ApplicationController
   before_action :authorize_request
+    skip_before_action :authorize_request, only: %i[index ]
 
   def index
-    listings = Listing.all
-    render json: listings
+    listings = Listing.includes(:address, pictures: :image_attachment)
+      .where(pictures: { main_img: true })
+    render json: listings.as_json(include: [:address, pictures: {methods: [:get_url]}])
   end
 
   def create
@@ -18,13 +20,23 @@ class Api::ListingsController < ApplicationController
     )
 
     # check type
-    type = Type.find_by!(id: type_params[:type])
+    type = Type.find_by!(id: listing_params[:type])
 
     # create listing
     if address.save
-      listing = @current_user.listings.build(listing_params.merge(address_id: address.id, type_id: type.id))
+      listing = @current_user.listings.build(listing_params.merge(address_id: address.id, type: type))
 
       if listing.save
+        main = Picture.new(main_img: 1, listing_id: listing.id)
+        main.image.attach(images_params[:main])
+        main.save!
+
+        images_params[:all].each do |image|
+          picture = Picture.new(main_img: 0, listing_id: listing.id)
+          picture.image.attach(image)
+          picture.save!
+        end
+
         render json: { listing: listing, address: address }, status: :created
       else
         address.destroy
@@ -39,15 +51,15 @@ class Api::ListingsController < ApplicationController
   private
   
   def listing_params
-    params.require(:listing).permit(:bedrooms, :bathrooms, :square_ft, :description)
+    params.require(:listing).permit(:bedrooms, :bathrooms, :square_ft, :description, :type)
   end
 
   def address_params
     params.require(:address).permit(:street, :city, :state)
   end
 
-  def type_params
-    params.require(:listing).permit(:type)
+  def images_params
+    params.require(:images).permit(:main, all: [])
   end
 
 end

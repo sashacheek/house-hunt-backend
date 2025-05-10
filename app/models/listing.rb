@@ -1,6 +1,6 @@
 class Listing < ApplicationRecord
-  belongs_to :lister, optional: true
-  belongs_to :address
-  belongs_to :type, optional: true
-  has_many :pictures, foreign_key: 'listing_id'
+  belongs_to :lister
+  belongs_to :address, dependent: :destroy
+  belongs_to :type
+  has_many :pictures, foreign_key: 'listing_id', dependent: :destroy
 end

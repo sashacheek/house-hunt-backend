@@ -72,4 +72,8 @@ Rails.application.configure do
   config.middleware.use ActionDispatch::Cookies
   config.middleware.use config.session_store
 
+  # config/environments/development.rb
+Rails.application.routes.default_url_options[:host] = "http://localhost:4000"
+
+
 end
