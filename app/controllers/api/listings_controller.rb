@@ -7,18 +7,22 @@ class Api::ListingsController < ApplicationController
   end
 
   def create
-    address_data = params.require(:address).permit(:street, :city, :state)
+    # check state
+    state = State.find_by!(state_code: address_params[:state])
   
-    state = State.find_by!(state_code: address_data[:state])
-  
+    # create address
     address = Address.new(
-      street: address_data[:street],
-      city: address_data[:city],
+      street: address_params[:street],
+      city: address_params[:city],
       state: state
     )
-  
+
+    # check type
+    type = Type.find_by!(id: type_params[:type])
+
+    # create listing
     if address.save
-      listing = @current_user.listings.build(listing_params.merge(address_id: address.id))
+      listing = @current_user.listings.build(listing_params.merge(address_id: address.id, type_id: type.id))
 
       if listing.save
         render json: { listing: listing, address: address }, status: :created
@@ -35,11 +39,15 @@ class Api::ListingsController < ApplicationController
   private
   
   def listing_params
-    params.require(:listing).permit(:bedrooms)
+    params.require(:listing).permit(:bedrooms, :bathrooms, :square_ft, :description)
   end
 
   def address_params
     params.require(:address).permit(:street, :city, :state)
+  end
+
+  def type_params
+    params.require(:listing).permit(:type)
   end
 
 end
