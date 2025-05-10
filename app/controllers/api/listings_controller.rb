@@ -8,6 +8,11 @@ class Api::ListingsController < ApplicationController
     render json: listings.as_json(include: [:address, pictures: {methods: [:get_url]}])
   end
 
+  def show
+    listing = Listing.includes(:address, pictures: :image_attachment).find(params[:id])
+    render json: listing.as_json(include: [:address, pictures: {methods: [:get_url]}])
+  end
+
   def create
     # check state
     state = State.find_by!(state_code: address_params[:state])
