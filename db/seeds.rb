@@ -77,6 +77,6 @@ types = [
 
 (0..1).each do |i|
   type = Type.find_or_initialize_by(id:i)
-  type.type = types[i][:type]
+  type.type_name = types[i][:type]
   type.save!
 end
