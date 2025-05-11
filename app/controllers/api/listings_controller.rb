@@ -21,7 +21,8 @@ class Api::ListingsController < ApplicationController
     address = Address.new(
       street: address_params[:street],
       city: address_params[:city],
-      state: state
+      state: state,
+      zip_code: address_params[:zip_code]
     )
 
     # check type
@@ -60,7 +61,7 @@ class Api::ListingsController < ApplicationController
   end
 
   def address_params
-    params.require(:address).permit(:street, :city, :state)
+    params.require(:address).permit(:street, :city, :state, :zip_code)
   end
 
   def images_params

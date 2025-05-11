@@ -83,4 +83,6 @@ Rails.application.configure do
   config.session_store :cookie_store, key: "_house_hunt_session"
   config.middleware.use ActionDispatch::Cookies
   config.middleware.use config.session_store
+
+  Rails.application.routes.default_url_options[:host] = ENV.fetch("BACKEND", "http://localhost:4000")
 end
