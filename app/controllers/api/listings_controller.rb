@@ -1,6 +1,6 @@
 class Api::ListingsController < ApplicationController
   before_action :authorize_request
-    skip_before_action :authorize_request, only: %i[index ]
+    skip_before_action :authorize_request, only: %i[index show]
 
   def index
     listings = Listing.includes(:address, pictures: :image_attachment)
