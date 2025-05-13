@@ -5,6 +5,7 @@ class Api::ListingsController < ApplicationController
   def index
     listings = Listing.includes(:address, pictures: :image_attachment)
       .where(pictures: { main_img: true })
+      .order(updated_at: :desc)
     render json: listings.as_json(include: [:address, pictures: {methods: [:get_url]}])
   end
 
