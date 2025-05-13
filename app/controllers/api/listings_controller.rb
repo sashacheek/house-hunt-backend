@@ -13,6 +13,34 @@ class Api::ListingsController < ApplicationController
     render json: listing.as_json(include: [:address, pictures: {methods: [:get_url]}])
   end
 
+  def update
+    listing = Listing.find(params[:id])
+    address = Address.find(address_params[:id])
+    state = State.find_by!(state_code: address_params[:state])
+    if listing.update(
+      bathrooms: listing_params[:bathrooms],
+      bedrooms: listing_params[:bedrooms],
+      square_ft: listing_params[:square_ft],
+      description: listing_params[:description],
+      price: listing_params[:price]
+      )
+      if address.update(
+        street: address_params[:street],
+        city: address_params[:city],
+        zip_code: address_params[:zip_code],
+        state: state
+      )
+        render json: listing, status: :ok
+      else
+        render json: { errors: address.errors.full_messages }, status: :unprocessable_entity
+      end
+    else
+      render json: { errors: listing.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+
+
   def create
     # check state
     state = State.find_by!(state_code: address_params[:state])
@@ -52,16 +80,30 @@ class Api::ListingsController < ApplicationController
       render json: { errors: address.errors.full_messages }, status: :unprocessable_entity
     end
   end
+
+  def destroy
+    listing = Listing.find(params[:id])
+
+    if listing.pictures.destroy_all
+      if listing.destroy
+        render json: { message: "listing deleted successfully" }, status: :ok
+      else
+        render json: { errors: listing.errors.full_messages }, status: :unprocessable_entity
+      end
+    else
+      render json: { errors: "picture deletion failed" }, status: :unprocessable_entity
+    end
+  end
   
   
   private
   
   def listing_params
-    params.require(:listing).permit(:bedrooms, :bathrooms, :square_ft, :description, :type)
+    params.require(:listing).permit(:id, :bedrooms, :bathrooms, :square_ft, :description, :type, :price)
   end
 
   def address_params
-    params.require(:address).permit(:street, :city, :state, :zip_code)
+    params.require(:address).permit(:id, :street, :city, :state, :zip_code)
   end
 
   def images_params

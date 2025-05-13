@@ -18,4 +18,18 @@ class Api::ListersController < ApplicationController
       end
     end
   end
+
+  def lister_listings
+    token = request.headers["Authorization"]&.split("Bearer ")&.last
+    lister = Lister.find_by(auth_token: token)
+    if lister
+      listings = lister.listings.includes(:address, pictures: :image_attachment)
+        .where(pictures: { main_img: true })
+        .order(updated_at: :desc)
+      render json: listings.as_json(include: { address: {}, pictures: {methods: [:get_url]}})
+    else
+      render json: {error: "Invalid token"}, status: :unauthorized
+    end
+  end
+
 end
