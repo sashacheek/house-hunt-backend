@@ -17,12 +17,14 @@ class Api::ListingsController < ApplicationController
     listing = Listing.find(params[:id])
     address = Address.find(address_params[:id])
     state = State.find_by!(state_code: address_params[:state])
+    type = Type.find_by!(id: listing_params[:type])
     if listing.update(
       bathrooms: listing_params[:bathrooms],
       bedrooms: listing_params[:bedrooms],
       square_ft: listing_params[:square_ft],
       description: listing_params[:description],
-      price: listing_params[:price]
+      price: listing_params[:price],
+      type: type
       )
       if address.update(
         street: address_params[:street],
